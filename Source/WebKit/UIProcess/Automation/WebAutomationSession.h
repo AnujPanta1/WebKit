@@ -167,6 +167,10 @@ public:
 #if ENABLE(WEBDRIVER_BIDI)
     void didCreatePage(WebPageProxy&);
     void navigationStartedForFrame(const WebFrameProxy&, const String& url, std::optional<WebCore::NavigationIdentifier>, double timestamp);
+    void navigationCommittedForFrame(const WebFrameProxy&, const String& url, std::optional<WebCore::NavigationIdentifier>, double timestamp);
+    void navigationFailedForFrame(const WebFrameProxy&, const String& url, std::optional<WebCore::NavigationIdentifier>, double timestamp);
+    void navigationAbortedForFrame(const WebFrameProxy&, const String& url, std::optional<WebCore::NavigationIdentifier>, double timestamp);
+    void fragmentNavigatedForFrame(const WebFrameProxy&, const String& url, std::optional<WebCore::NavigationIdentifier>, double timestamp);
 #endif
     void willClosePage(const WebPageProxy&);
     void handleRunOpenPanel(const WebPageProxy&, const WebFrameProxy&, const API::OpenPanelParameters&, WebOpenPanelResultListenerProxy&);

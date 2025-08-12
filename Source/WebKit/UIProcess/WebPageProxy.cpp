@@ -6960,6 +6960,15 @@ void WebPageProxy::didCancelClientRedirectForFrame(IPC::Connection& connection, 
 
     WEBPAGEPROXY_RELEASE_LOG(Loading, "didCancelClientRedirectForFrame: frameID=%" PRIu64 ", isMainFrame=%d", frameID.toUInt64(), frame->isMainFrame());
 
+#if ENABLE(WEBDRIVER_BIDI)
+    if (m_controlledByAutomation) {
+        if (RefPtr automationSession = m_configuration->processPool().automationSession()) {
+            auto timestamp = WallTime::now().secondsSinceEpoch().milliseconds();
+            automationSession->navigationAbortedForFrame(*frame, frame->url().string(), std::nullopt, timestamp);
+        }
+    }
+#endif
+
     if (frame->isMainFrame())
         m_navigationClient->didCancelClientRedirect(*this);
 }
@@ -7047,6 +7056,14 @@ void WebPageProxy::didFailProvisionalLoadForFrameShared(Ref<WebProcessProxy>&& p
     frame.didFailProvisionalLoad();
 
     protectedPageLoadState->commitChanges();
+#if ENABLE(WEBDRIVER_BIDI)
+    if (m_controlledByAutomation) {
+        if (RefPtr automationSession = process->processPool().automationSession()) {
+            auto timestamp = WallTime::now().secondsSinceEpoch().milliseconds();
+            automationSession->navigationFailedForFrame(frame, provisionalURL, navigationID, timestamp);
+        }
+    }
+#endif
 
     ASSERT(!m_failingProvisionalLoadURL);
     m_failingProvisionalLoadURL = WTFMove(provisionalURL);
@@ -7282,6 +7299,14 @@ void WebPageProxy::didCommitLoadForFrame(IPC::Connection& connection, FrameIdent
     }
 
     protectedPageLoadState->commitChanges();
+#if ENABLE(WEBDRIVER_BIDI)
+    if (m_controlledByAutomation) {
+        if (RefPtr automationSession = process->processPool().automationSession()) {
+            auto timestamp = WallTime::now().secondsSinceEpoch().milliseconds();
+            automationSession->navigationCommittedForFrame(*frame, frame->url().string(), navigationID, timestamp);
+        }
+    }
+#endif
     if (m_loaderClient)
         m_loaderClient->didCommitLoadForFrame(*this, *frame, navigation.get(), process->transformHandlesToObjects(userData.protectedObject().get()).get());
     else {
@@ -7519,6 +7544,14 @@ void WebPageProxy::didFailLoadForFrame(IPC::Connection& connection, FrameIdentif
     generatePageLoadingTimingSoon();
 
     protectedPageLoadState->commitChanges();
+#if ENABLE(WEBDRIVER_BIDI)
+    if (m_controlledByAutomation) {
+        if (RefPtr automationSession = process->processPool().automationSession()) {
+            auto timestamp = WallTime::now().secondsSinceEpoch().milliseconds();
+            automationSession->navigationFailedForFrame(*frame, frame->url().string(), navigationID, timestamp);
+        }
+    }
+#endif
     Ref process = WebProcessProxy::fromConnection(connection);
     if (m_loaderClient)
         m_loaderClient->didFailLoadWithErrorForFrame(*this, *frame, navigation.get(), error, process->transformHandlesToObjects(userData.protectedObject().get()).get());
@@ -7579,6 +7612,14 @@ void WebPageProxy::didSameDocumentNavigationForFrame(IPC::Connection& connection
     frame->didSameDocumentNavigation(WTFMove(url));
 
     protectedPageLoadState->commitChanges();
+#if ENABLE(WEBDRIVER_BIDI)
+    if (m_controlledByAutomation) {
+        if (RefPtr automationSession = m_configuration->processPool().automationSession()) {
+            auto timestamp = WallTime::now().secondsSinceEpoch().milliseconds();
+            automationSession->fragmentNavigatedForFrame(*frame, frame->url().string(), navigationID, timestamp);
+        }
+    }
+#endif
 
     if (isMainFrame) {
         Ref process = WebProcessProxy::fromConnection(connection);
@@ -7626,6 +7667,15 @@ void WebPageProxy::didSameDocumentNavigationForFrameViaJS(IPC::Connection& conne
     frame->didSameDocumentNavigation(WTFMove(url));
 
     protectedPageLoadState->commitChanges();
+#if ENABLE(WEBDRIVER_BIDI)
+    if (m_controlledByAutomation) {
+        if (RefPtr automationSession = process->processPool().automationSession()) {
+            auto timestamp = WallTime::now().secondsSinceEpoch().milliseconds();
+            std::optional<WebCore::NavigationIdentifier> navID = navigation ? std::optional(navigation->navigationID()) : std::nullopt;
+            automationSession->fragmentNavigatedForFrame(*frame, frame->url().string(), navID, timestamp);
+        }
+    }
+#endif
 
     if (isMainFrame)
         m_navigationClient->didSameDocumentNavigation(*this, navigation.get(), navigationType, process->transformHandlesToObjects(userData.protectedObject().get()).get());

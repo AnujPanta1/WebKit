@@ -177,6 +177,50 @@
             ]
         },
         {
+            "name": "navigationCommitted",
+            "description": "Event fired when navigation commits in a navigable.",
+            "spec": "https://w3c.github.io/webdriver-bidi/#event-browsingContext-navigationCommitted",
+            "parameters": [
+                { "name": "context", "$ref": "BidiBrowsingContext.BrowsingContext" },
+                { "name": "navigation", "$ref": "BidiBrowsingContext.Navigation", "nullable": true },
+                { "name": "timestamp", "type": "number", "description": "Time value in milliseconds representing the current date and time in UTC." },
+                { "name": "url", "type": "string" }
+            ]
+        },
+        {
+            "name": "navigationFailed",
+            "description": "Event fired when navigation fails in a navigable.",
+            "spec": "https://w3c.github.io/webdriver-bidi/#event-browsingContext-navigationFailed",
+            "parameters": [
+                { "name": "context", "$ref": "BidiBrowsingContext.BrowsingContext" },
+                { "name": "navigation", "$ref": "BidiBrowsingContext.Navigation", "nullable": true },
+                { "name": "timestamp", "type": "number", "description": "Time value in milliseconds representing the current date and time in UTC." },
+                { "name": "url", "type": "string" }
+            ]
+        },
+        {
+            "name": "navigationAborted",
+            "description": "Event fired when navigation is aborted in a navigable.",
+            "spec": "https://w3c.github.io/webdriver-bidi/#event-browsingContext-navigationAborted",
+            "parameters": [
+                { "name": "context", "$ref": "BidiBrowsingContext.BrowsingContext" },
+                { "name": "navigation", "$ref": "BidiBrowsingContext.Navigation", "nullable": true },
+                { "name": "timestamp", "type": "number", "description": "Time value in milliseconds representing the current date and time in UTC." },
+                { "name": "url", "type": "string" }
+            ]
+        },
+        {
+            "name": "fragmentNavigated",
+            "description": "Event fired when fragment navigation occurs in a navigable.",
+            "spec": "https://w3c.github.io/webdriver-bidi/#event-browsingContext-fragmentNavigated",
+            "parameters": [
+                { "name": "context", "$ref": "BidiBrowsingContext.BrowsingContext" },
+                { "name": "navigation", "$ref": "BidiBrowsingContext.Navigation", "nullable": true },
+                { "name": "timestamp", "type": "number", "description": "Time value in milliseconds representing the current date and time in UTC." },
+                { "name": "url", "type": "string" }
+            ]
+        },
+        {
             "name": "userPromptClosed",
             "description": "Event fired when a user prompt is dismissed in a navigable.",
             "spec": "https://w3c.github.io/webdriver-bidi/#event-browsingContext-userPromptClosed",

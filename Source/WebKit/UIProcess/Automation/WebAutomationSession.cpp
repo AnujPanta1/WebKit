@@ -952,16 +952,50 @@ void WebAutomationSession::didCreatePage(WebPageProxy& page)
     m_bidiProcessor->browserAgent().didCreatePage(page);
 }
 
+#if ENABLE(WEBDRIVER_BIDI)
+static String convertNavigationIDToString(std::optional<WebCore::NavigationIdentifier> navigationID)
+{
+    if (!navigationID)
+        return nullString();
+
+    uint64_t id = navigationID->toUInt64();
+    auto uuid = WTF::UUID(id, id);
+    return uuid.toString();
+}
+
 void WebAutomationSession::navigationStartedForFrame(const WebFrameProxy& frame, const String& url, std::optional<WebCore::NavigationIdentifier> navigationID, double timestamp)
 {
     String browsingContextHandle = handleForWebFrameProxy(frame);
-    String navigationIDString = nullString();
-    if (navigationID) {
-        uint64_t id = navigationID->toUInt64();
-        auto uuid = WTF::UUID(id, id);
-        navigationIDString = uuid.toString();
-    }
+    String navigationIDString = convertNavigationIDToString(navigationID);
     m_bidiProcessor->browsingContextDomainNotifier().navigationStarted(browsingContextHandle, navigationIDString, timestamp, url);
+}
+
+void WebAutomationSession::navigationCommittedForFrame(const WebFrameProxy& frame, const String& url, std::optional<WebCore::NavigationIdentifier> navigationID, double timestamp)
+{
+    String browsingContextHandle = handleForWebFrameProxy(frame);
+    String navigationIDString = convertNavigationIDToString(navigationID);
+    m_bidiProcessor->browsingContextDomainNotifier().navigationCommitted(browsingContextHandle, navigationIDString, timestamp, url);
+}
+
+void WebAutomationSession::navigationFailedForFrame(const WebFrameProxy& frame, const String& url, std::optional<WebCore::NavigationIdentifier> navigationID, double timestamp)
+{
+    String browsingContextHandle = handleForWebFrameProxy(frame);
+    String navigationIDString = convertNavigationIDToString(navigationID);
+    m_bidiProcessor->browsingContextDomainNotifier().navigationFailed(browsingContextHandle, navigationIDString, timestamp, url);
+}
+
+void WebAutomationSession::navigationAbortedForFrame(const WebFrameProxy& frame, const String& url, std::optional<WebCore::NavigationIdentifier> navigationID, double timestamp)
+{
+    String browsingContextHandle = handleForWebFrameProxy(frame);
+    String navigationIDString = convertNavigationIDToString(navigationID);
+    m_bidiProcessor->browsingContextDomainNotifier().navigationAborted(browsingContextHandle, navigationIDString, timestamp, url);
+}
+
+void WebAutomationSession::fragmentNavigatedForFrame(const WebFrameProxy& frame, const String& url, std::optional<WebCore::NavigationIdentifier> navigationID, double timestamp)
+{
+    String browsingContextHandle = handleForWebFrameProxy(frame);
+    String navigationIDString = convertNavigationIDToString(navigationID);
+    m_bidiProcessor->browsingContextDomainNotifier().fragmentNavigated(browsingContextHandle, navigationIDString, timestamp, url);
 }
 #endif
 
